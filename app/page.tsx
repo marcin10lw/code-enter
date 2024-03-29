@@ -1,9 +1,9 @@
-import CodeEnter from "@/components/CodeEnter";
+import OTP from "@/components/OTP";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
-      <CodeEnter />
+      <OTP inputsAmt={6} />
     </main>
   );
 }
