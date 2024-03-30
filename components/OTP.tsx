@@ -69,8 +69,32 @@ const OTP = ({ OTPStructure }: OTPProps) => {
     }
 
     if (value.length === 0) {
+      const newInputs = [...OTPInputs];
+
+      const currentInputIndex = newInputs.findIndex(
+        (input) => typeof input !== "string" && input.index === index
+      );
+      const nextInputIndex = newInputs.findIndex(
+        (input) => typeof input !== "string" && input.index === index + 1
+      );
+      const lastInputIndex = newInputs.findIndex(
+        (input) => typeof input !== "string" && input.index === inputsAmt - 1
+      );
+
+      if (index === inputsAmt - 1) {
+        // @ts-ignore
+        newInputs[lastInputIndex].value = "";
+      } else {
+        if (currentInputIndex !== -1 && nextInputIndex !== -1) {
+          // @ts-ignore
+          newInputs[currentInputIndex].value = newInputs[nextInputIndex].value;
+          // @ts-ignore
+          newInputs[nextInputIndex].value = "";
+        }
+      }
+
       index > 0 && focusInput(index - 1);
-      setInputs(value, index);
+      setOTPInputs(newInputs);
     }
   };
 
@@ -85,6 +109,11 @@ const OTP = ({ OTPStructure }: OTPProps) => {
       event.preventDefault();
       focusInput(index + 1);
       selectInput(index + 1);
+    }
+
+    if (event.key === "Backspace" && !event.currentTarget.value && index > 0) {
+      event.preventDefault();
+      focusInput(index - 1);
     }
   };
 
