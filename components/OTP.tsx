@@ -2,57 +2,115 @@
 
 import { KeyboardEvent, useEffect, useRef, useState } from "react";
 
-interface CodeEnterProps {
-  inputsAmt: number;
+interface OTPProps {
+  OTPStructure: (number | string)[];
 }
 
-const OTP = ({ inputsAmt }: CodeEnterProps) => {
-  const [inputs, setInputs] = useState<string[]>(new Array(inputsAmt).fill(""));
+type OTPInput =
+  | {
+      index: number;
+      value: string;
+    }
+  | string;
+
+const OTP = ({ OTPStructure }: OTPProps) => {
+  const [OTPInputs, setOTPInputs] = useState<OTPInput[]>([]);
   const inputsRef = useRef<HTMLInputElement[]>([]);
 
+  const inputsAmt = OTPInputs.filter(
+    (input) => typeof input !== "string"
+  ).length;
+
+  useEffect(() => {
+    const newInputs: OTPInput[] = [];
+    let newIndex = 0;
+
+    OTPStructure.forEach((item) => {
+      if (typeof item === "number") {
+        for (let i = 0; i < item; i++) {
+          newInputs.push({ index: newIndex, value: "" });
+          newIndex++;
+        }
+      } else {
+        newInputs.push(item);
+      }
+    });
+
+    setOTPInputs(newInputs);
+  }, [OTPStructure]);
+
+  const focusInput = (index: number) => {
+    inputsRef.current[index].focus();
+  };
+
+  const selectInput = (index: number) => {
+    inputsRef.current[index].select();
+  };
+
+  const setInputs = (value: string, index: number) => {
+    setOTPInputs((prevInputs) =>
+      prevInputs.map((input) => {
+        if (typeof input !== "string" && input.index === index) {
+          return {
+            ...input,
+            value,
+          };
+        }
+
+        return input;
+      })
+    );
+  };
+
   const onInputChange = (value: string, index: number) => {
-    if (value.length > 1) return;
-
-    const newInputs: string[] = [...inputs];
-    newInputs[index] = value;
-    setInputs(newInputs);
-
-    if (value.length === 1 && index < inputsAmt - 1) {
-      inputsRef.current[index + 1].focus();
+    if (value.length === 1) {
+      index < inputsAmt - 1 && focusInput(index + 1);
+      setInputs(value, index);
     }
 
-    if (value.length === 0 && index > 0) {
-      inputsRef.current[index - 1].focus();
+    if (value.length === 0) {
+      index > 0 && focusInput(index - 1);
+      setInputs(value, index);
     }
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>, index: number) => {
     if (event.key === "ArrowLeft" && index > 0) {
       event.preventDefault();
-      inputsRef.current[index - 1].focus();
+      focusInput(index - 1);
+      selectInput(index - 1);
     }
 
     if (event.key === "ArrowRight" && index < inputsAmt - 1) {
       event.preventDefault();
-      inputsRef.current[index + 1].focus();
+      focusInput(index + 1);
+      selectInput(index + 1);
     }
   };
 
   return (
-    <div>
-      {inputs.map((input, index) => {
+    <div className="flex items-center gap-2 mt-4">
+      {OTPInputs.map((input, listIndex) => {
+        if (typeof input !== "string") {
+          return (
+            <input
+              key={listIndex}
+              value={input.value}
+              onChange={({ target }) =>
+                onInputChange(target.value, input.index)
+              }
+              onKeyDown={(event) => onKeyDown(event, input.index)}
+              //@ts-ignore
+              ref={(el) => el && (inputsRef.current[input.index] = el)}
+              className="border border-slate-400 text-xl p-2 size-16 text-center bg-transparent text-white"
+            />
+          );
+        }
+
         return (
-          <input
-            key={index}
-            value={input}
-            onChange={({ target }) => onInputChange(target.value, index)}
-            onKeyUp={(event) => onKeyDown(event, index)}
-            // @ts-ignores
-            ref={(el) => el && (inputsRef.current[index] = el)}
-            type="text"
-            className="border border-purple p-2 size-14"
-            maxLength={1}
-          />
+          <span key={listIndex} className="text-white text-xl">
+            {input}
+          </span>
         );
       })}
     </div>
