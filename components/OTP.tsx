@@ -21,8 +21,6 @@ const OTP = ({ OTPStructure }: OTPProps) => {
     (input) => typeof input !== "string"
   ).length;
 
-  const ONLY_DIGITS_REGEXP = "^\\d+$";
-
   useEffect(() => {
     const newInputs: OTPInput[] = [];
     let newIndex = 0;
@@ -65,10 +63,7 @@ const OTP = ({ OTPStructure }: OTPProps) => {
   };
 
   const onInputChange = (value: string, index: number) => {
-    if (
-      value.length === 1 &&
-      new RegExp(ONLY_DIGITS_REGEXP).test(value.trim())
-    ) {
+    if (value.length === 1 && value.trim().match(/\d/g)) {
       setInputs(value, index);
       index < inputsAmt - 1 && focusInput(index + 1);
     }
@@ -78,37 +73,6 @@ const OTP = ({ OTPStructure }: OTPProps) => {
     }
 
     if (value.length === 0) {
-      // const newInputs = [...OTPInputs];
-
-      // const currentInputIndex = newInputs.findIndex(
-      //   (input) => typeof input !== "string" && input.index === index
-      // );
-      // const nextInputIndex = newInputs.findIndex(
-      //   (input) => typeof input !== "string" && input.index === index + 1
-      // );
-      // const lastInputIndex = newInputs.findIndex(
-      //   (input) => typeof input !== "string" && input.index === inputsAmt - 1
-      // );
-      // const lastActiveInputIndex = newInputs.findLastIndex(
-      //   (input) => typeof input !== "string" && input.value
-      // );
-
-      // if (index === inputsAmt - 1) {
-      //   // @ts-ignore
-      //   newInputs[lastInputIndex].value = "";
-      // } else {
-      //   if (currentInputIndex !== -1 && nextInputIndex !== -1) {
-      //     for (let i = 0; i < inputsAmt; i++) {
-      //       // @ts-ignore
-      //       newInputs[lastInputIndex].value = "";
-      //       // @ts-ignore
-      //       newInputs[currentInputIndex].value =
-      //         // @ts-ignore
-      //         newInputs[nextInputIndex].value;
-      //     }
-      //   }
-      // }
-
       index > 0 && focusInput(index - 1);
       setInputs("", index);
     }
@@ -133,6 +97,16 @@ const OTP = ({ OTPStructure }: OTPProps) => {
     }
   };
 
+  const onPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const pastedCode = event.clipboardData.getData("text");
+    const pastedCodeChars = pastedCode.split("");
+
+    for (let i = 0; i < pastedCodeChars.length; i++) {
+      setInputs(pastedCodeChars[i], i);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2 mt-4">
@@ -146,6 +120,7 @@ const OTP = ({ OTPStructure }: OTPProps) => {
                   onInputChange(target.value, input.index)
                 }
                 onKeyDown={(event) => onKeyDown(event, input.index)}
+                onPaste={onPaste}
                 //@ts-ignore
                 ref={(el) => el && (inputsRef.current[input.index] = el)}
                 className="border border-slate-400 text-xl p-2 size-16 text-center bg-transparent text-white"
