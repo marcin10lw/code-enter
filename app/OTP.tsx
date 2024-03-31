@@ -14,15 +14,17 @@ type OTPInput = {
   value: string;
 };
 
-const OTP = ({ OTPStructure, autoFocus }: OTPProps) => {
+const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
   const [OTPInputs, setOTPInputs] = useState<(OTPInput | string)[]>([]);
-  const inputsRef = useRef<HTMLInputElement[]>([]);
+  const inputRefs = useRef<HTMLInputElement[]>([]);
 
   const filteredOTPInputs = OTPInputs.filter(
     (input): input is OTPInput => typeof input !== "string",
   );
 
   const inputsAmt = filteredOTPInputs.length;
+
+  const disabled = filteredOTPInputs.some((input) => input.value === "");
 
   useEffect(() => {
     const newInputs: (OTPInput | string)[] = [];
@@ -44,16 +46,16 @@ const OTP = ({ OTPStructure, autoFocus }: OTPProps) => {
 
   const focusInput = (index: number, action?: "prev" | "next") => {
     if (action === "prev" && index > 0) {
-      inputsRef.current[index - 1].focus();
+      inputRefs.current[index - 1].focus();
     } else if (action === "next" && index < inputsAmt - 1) {
-      inputsRef.current[index + 1].focus();
+      inputRefs.current[index + 1].focus();
     } else {
-      inputsRef.current[index].focus();
+      inputRefs.current[index].focus();
     }
   };
 
   const selectInput = (index: number) => {
-    inputsRef.current[index].select();
+    inputRefs.current[index].select();
   };
 
   const setInputs = (value: string, index: number) => {
@@ -135,8 +137,6 @@ const OTP = ({ OTPStructure, autoFocus }: OTPProps) => {
     }
   };
 
-  const disabled = filteredOTPInputs.some((input) => input.value === "");
-
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -151,43 +151,47 @@ const OTP = ({ OTPStructure, autoFocus }: OTPProps) => {
   };
 
   return (
-    OTPInputs.length && (
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          {OTPInputs.map((input, listIndex) => {
-            if (typeof input !== "string") {
+    OTPInputs.length > 0 && (
+      <section className="rounded-md bg-slate-800 p-6 pb-6">
+        <h1 className="mb-6 text-2xl text-white text-center">Enter verification code</h1>
+        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
+          <div className="flex items-center gap-2">
+            {OTPInputs.map((input, listIndex) => {
+              if (typeof input !== "string") {
+                return (
+                  <input
+                    key={listIndex}
+                    value={input.value}
+                    onChange={({ target }) =>
+                      onInputChange(target.value, input.index)
+                    }
+                    onKeyDown={(event) => onKeyDown(event, input.index)}
+                    onPaste={onPaste}
+                    ref={(el) => {
+                      el && (inputRefs.current[input.index] = el);
+                    }}
+                    autoFocus={autoFocus && input.index === 0}
+                    className="h-16 w-full max-w-16 border border-slate-400 bg-transparent text-center text-xl text-white"
+                  />
+                );
+              }
+
               return (
-                <input
-                  key={listIndex}
-                  value={input.value}
-                  onChange={({ target }) =>
-                    onInputChange(target.value, input.index)
-                  }
-                  onKeyDown={(event) => onKeyDown(event, input.index)}
-                  onPaste={onPaste}
-                  //@ts-ignore
-                  ref={(el) => el && (inputsRef.current[input.index] = el)}
-                  autoFocus={autoFocus && input.index === 0}
-                  className="size-16 border border-slate-400 bg-transparent p-2 text-center text-xl text-white"
-                />
+                <span key={listIndex} className="text-xl text-white">
+                  {input}
+                </span>
               );
-            }
+            })}
+          </div>
 
-            return (
-              <span key={listIndex} className="text-xl text-white">
-                {input}
-              </span>
-            );
-          })}
-        </div>
-
-        <button
-          disabled={disabled}
-          className="rounded-sm bg-blue-600 p-3 text-xl tracking-wide text-white hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-70"
-        >
-          Verify
-        </button>
-      </form>
+          <button
+            disabled={disabled}
+            className="rounded-sm bg-blue-600 p-3 text-xl tracking-wide text-white hover:bg-blue-500 disabled:pointer-events-none disabled:opacity-70"
+          >
+            Verify
+          </button>
+        </form>
+      </section>
     )
   );
 };
