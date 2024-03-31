@@ -2,6 +2,8 @@
 
 The OTP Input Component is a React component designed for entering and verifying OTP codes. It's a solution for a job recruitment task.
 
+[Live demo](https://otp-component-mauve.vercel.app/)
+
 ## Props
 
 - **OTPStructure** (`(number | string)[]`): Specifies the structure of the OTP input. It is an array containing numbers (indicating the number of input fields) and strings (representing separators).
