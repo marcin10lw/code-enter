@@ -22,7 +22,7 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
     (input): input is OTPInput => typeof input !== "string",
   );
 
-  const inputsAmt = filteredOTPInputs.length;
+  const inputsAmount = filteredOTPInputs.length;
 
   const disabled = filteredOTPInputs.some((input) => input.value === "");
 
@@ -47,15 +47,21 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
   const focusInput = (index: number, action?: "prev" | "next") => {
     if (action === "prev" && index > 0) {
       inputRefs.current[index - 1].focus();
-    } else if (action === "next" && index < inputsAmt - 1) {
+    } else if (action === "next" && index < inputsAmount - 1) {
       inputRefs.current[index + 1].focus();
     } else {
       inputRefs.current[index].focus();
     }
   };
 
-  const selectInput = (index: number) => {
-    inputRefs.current[index].select();
+  const selectInput = (index: number, action?: "prev" | "next") => {
+    if (action === "prev" && index > 0) {
+      inputRefs.current[index - 1].select();
+    } else if (action === "next" && index < inputsAmount - 1) {
+      inputRefs.current[index + 1].select();
+    } else {
+      inputRefs.current[index].select();
+    }
   };
 
   const setInputs = (value: string, index: number) => {
@@ -90,19 +96,19 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (event.key === "ArrowLeft" && index > 0) {
+    if (event.key === "ArrowLeft") {
       event.preventDefault();
       focusInput(index, "prev");
-      selectInput(index - 1);
+      selectInput(index, "prev");
     }
 
-    if (event.key === "ArrowRight" && index < inputsAmt - 1) {
+    if (event.key === "ArrowRight") {
       event.preventDefault();
       focusInput(index, "next");
-      selectInput(index + 1);
+      selectInput(index, "next");
     }
 
-    if (event.key === "Backspace" && !event.currentTarget.value && index > 0) {
+    if (event.key === "Backspace" && !event.currentTarget.value) {
       event.preventDefault();
       focusInput(index, "prev");
     }
@@ -113,11 +119,11 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
 
     code.split("").forEach((char) => {
       if (isDigitChar(char)) {
-        sanitizedCode = sanitizedCode.concat(char);
+        sanitizedCode += char;
       }
     });
-
-    return sanitizedCode.slice(0, inputsAmt);
+    console.log(sanitizedCode);
+    return sanitizedCode.slice(0, inputsAmount);
   };
 
   const onPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
@@ -130,10 +136,10 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
       setInputs(sanitizedPastedCode[i], i);
     }
 
-    if (sanitizedPastedCode.length < inputsAmt) {
+    if (sanitizedPastedCode.length < inputsAmount) {
       focusInput(sanitizedPastedCode.length);
     } else {
-      focusInput(inputsAmt - 1);
+      focusInput(inputsAmount - 1);
     }
   };
 
@@ -142,10 +148,13 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
 
     if (disabled) return;
 
-    const finalCode = filteredOTPInputs.reduce(
-      (acc, { value }) => acc + value,
-      "",
-    );
+    const finalCode = OTPInputs.reduce((acc, input) => {
+      if (typeof input !== "string") {
+        return acc + input.value;
+      } else {
+        return acc + input;
+      }
+    }, "");
 
     alert(finalCode);
   };
