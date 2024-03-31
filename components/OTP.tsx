@@ -41,8 +41,14 @@ const OTP = ({ OTPStructure }: OTPProps) => {
 
   const isDigitChar = (value: string) => value.match(/\d/g);
 
-  const focusInput = (index: number) => {
-    inputsRef.current[index].focus();
+  const focusInput = (index: number, action?: "prev" | "next") => {
+    if (action === "prev" && index > 0) {
+      inputsRef.current[index - 1].focus();
+    } else if (action === "next" && index < inputsAmt - 1) {
+      inputsRef.current[index + 1].focus();
+    } else {
+      inputsRef.current[index].focus();
+    }
   };
 
   const selectInput = (index: number) => {
@@ -67,15 +73,15 @@ const OTP = ({ OTPStructure }: OTPProps) => {
   const onInputChange = (value: string, index: number) => {
     if (value.length === 1 && isDigitChar(value.trim())) {
       setInputs(value, index);
-      index < inputsAmt - 1 && focusInput(index + 1);
+      focusInput(index, "next");
     }
 
     if (value.length > 1) {
-      index < inputsAmt - 1 && focusInput(index + 1);
+      focusInput(index, "next");
     }
 
     if (value.length === 0) {
-      index > 0 && focusInput(index - 1);
+      focusInput(index, "prev");
       setInputs("", index);
     }
   };
@@ -83,19 +89,19 @@ const OTP = ({ OTPStructure }: OTPProps) => {
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>, index: number) => {
     if (event.key === "ArrowLeft" && index > 0) {
       event.preventDefault();
-      focusInput(index - 1);
+      focusInput(index, "prev");
       selectInput(index - 1);
     }
 
     if (event.key === "ArrowRight" && index < inputsAmt - 1) {
       event.preventDefault();
-      focusInput(index + 1);
+      focusInput(index, "next");
       selectInput(index + 1);
     }
 
     if (event.key === "Backspace" && !event.currentTarget.value && index > 0) {
       event.preventDefault();
-      focusInput(index - 1);
+      focusInput(index, "prev");
     }
   };
 
