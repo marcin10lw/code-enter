@@ -16,7 +16,7 @@ const OTP = ({ OTPStructure }: OTPProps) => {
   const inputsRef = useRef<HTMLInputElement[]>([]);
 
   const filteredOTPInputs = OTPInputs.filter(
-    (input): input is OTPInput => typeof input !== "string"
+    (input): input is OTPInput => typeof input !== "string",
   );
 
   const inputsAmt = filteredOTPInputs.length;
@@ -66,7 +66,7 @@ const OTP = ({ OTPStructure }: OTPProps) => {
         }
 
         return input;
-      })
+      }),
     );
   };
 
@@ -143,7 +143,7 @@ const OTP = ({ OTPStructure }: OTPProps) => {
 
     const finalCode = filteredOTPInputs.reduce(
       (acc, { value }) => acc + value,
-      ""
+      "",
     );
 
     alert(finalCode);
@@ -151,7 +151,7 @@ const OTP = ({ OTPStructure }: OTPProps) => {
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-      <div className="flex items-center gap-2 mt-4">
+      <div className="mt-4 flex items-center gap-2">
         {OTPInputs.map((input, listIndex) => {
           if (typeof input !== "string") {
             return (
@@ -165,13 +165,13 @@ const OTP = ({ OTPStructure }: OTPProps) => {
                 onPaste={onPaste}
                 //@ts-ignore
                 ref={(el) => el && (inputsRef.current[input.index] = el)}
-                className="border border-slate-400 text-xl p-2 size-16 text-center bg-transparent text-white"
+                className="size-16 border border-slate-400 bg-transparent p-2 text-center text-xl text-white"
               />
             );
           }
 
           return (
-            <span key={listIndex} className="text-white text-xl">
+            <span key={listIndex} className="text-xl text-white">
               {input}
             </span>
           );
@@ -180,7 +180,7 @@ const OTP = ({ OTPStructure }: OTPProps) => {
 
       <button
         disabled={disabled}
-        className="bg-blue-600 rounded-md disabled:pointer-events-none hover:bg-blue-700 disabled:opacity-70 text-xl p-3 text-white tracking-wide"
+        className="rounded-sm bg-blue-600 p-3 text-xl tracking-wide text-white hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-70"
       >
         Verify
       </button>
