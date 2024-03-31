@@ -124,7 +124,7 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
     event.preventDefault();
 
     const pastedCode = event.clipboardData.getData("text").trim();
-    const sanitizedPastedCode = getSanitizedPastedCode(pastedCode.trim());
+    const sanitizedPastedCode = getSanitizedPastedCode(pastedCode);
 
     for (let i = 0; i < sanitizedPastedCode.length; i++) {
       setInputs(sanitizedPastedCode[i], i);
@@ -153,7 +153,9 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
   return (
     OTPInputs.length > 0 && (
       <section className="rounded-md bg-slate-800 p-6 pb-6">
-        <h1 className="mb-6 text-2xl text-white text-center">Enter verification code</h1>
+        <h1 className="mb-6 text-center text-2xl text-white">
+          Enter verification code
+        </h1>
         <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
           <div className="flex items-center gap-2">
             {OTPInputs.map((input, listIndex) => {

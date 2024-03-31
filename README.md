@@ -1,4 +1,29 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# OTP Input Component
+
+The OTP Input Component is a React component designed for entering and verifying OTP codes. It's a solution for a job recruitment task.
+
+## Props
+
+- **OTPStructure** (`(number | string)[]`): Specifies the structure of the OTP input. It is an array containing numbers (indicating the number of input fields) and strings (representing separators).
+
+  For example
+
+  ```tsx
+  <OTP OTPStructure={[2, "-", 3, "-", 4]} />
+  ```
+
+  will result with
+
+  ![Alt text](otp-example.png)
+
+- **autoFocus** (`boolean`, optional, default: `true`): Determines whether the first input field should be autofocused upon component mount.
+
+## Features
+
+- **Structured Input**: Define the structure of the OTP input using numbers and separators.
+- **Input Validation**: Only accepts digit characters as input.
+- **Automatic Focus**: Automatically focuses the next input field upon entering a digit.
+- **Paste Functionality**: Allows users to paste OTP codes, ignoring non-digit characters and handling excess digits intelligently.
 
 ## Getting Started
 
