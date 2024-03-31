@@ -21,6 +21,8 @@ const OTP = ({ OTPStructure }: OTPProps) => {
     (input) => typeof input !== "string"
   ).length;
 
+  const ONLY_DIGITS_REGEXP = "^\\d+$";
+
   useEffect(() => {
     const newInputs: OTPInput[] = [];
     let newIndex = 0;
@@ -63,38 +65,52 @@ const OTP = ({ OTPStructure }: OTPProps) => {
   };
 
   const onInputChange = (value: string, index: number) => {
-    if (value.length === 1) {
-      index < inputsAmt - 1 && focusInput(index + 1);
+    if (
+      value.length === 1 &&
+      new RegExp(ONLY_DIGITS_REGEXP).test(value.trim())
+    ) {
       setInputs(value, index);
+      index < inputsAmt - 1 && focusInput(index + 1);
+    }
+
+    if (value.length > 1) {
+      index < inputsAmt - 1 && focusInput(index + 1);
     }
 
     if (value.length === 0) {
-      const newInputs = [...OTPInputs];
+      // const newInputs = [...OTPInputs];
 
-      const currentInputIndex = newInputs.findIndex(
-        (input) => typeof input !== "string" && input.index === index
-      );
-      const nextInputIndex = newInputs.findIndex(
-        (input) => typeof input !== "string" && input.index === index + 1
-      );
-      const lastInputIndex = newInputs.findIndex(
-        (input) => typeof input !== "string" && input.index === inputsAmt - 1
-      );
+      // const currentInputIndex = newInputs.findIndex(
+      //   (input) => typeof input !== "string" && input.index === index
+      // );
+      // const nextInputIndex = newInputs.findIndex(
+      //   (input) => typeof input !== "string" && input.index === index + 1
+      // );
+      // const lastInputIndex = newInputs.findIndex(
+      //   (input) => typeof input !== "string" && input.index === inputsAmt - 1
+      // );
+      // const lastActiveInputIndex = newInputs.findLastIndex(
+      //   (input) => typeof input !== "string" && input.value
+      // );
 
-      if (index === inputsAmt - 1) {
-        // @ts-ignore
-        newInputs[lastInputIndex].value = "";
-      } else {
-        if (currentInputIndex !== -1 && nextInputIndex !== -1) {
-          // @ts-ignore
-          newInputs[currentInputIndex].value = newInputs[nextInputIndex].value;
-          // @ts-ignore
-          newInputs[nextInputIndex].value = "";
-        }
-      }
+      // if (index === inputsAmt - 1) {
+      //   // @ts-ignore
+      //   newInputs[lastInputIndex].value = "";
+      // } else {
+      //   if (currentInputIndex !== -1 && nextInputIndex !== -1) {
+      //     for (let i = 0; i < inputsAmt; i++) {
+      //       // @ts-ignore
+      //       newInputs[lastInputIndex].value = "";
+      //       // @ts-ignore
+      //       newInputs[currentInputIndex].value =
+      //         // @ts-ignore
+      //         newInputs[nextInputIndex].value;
+      //     }
+      //   }
+      // }
 
       index > 0 && focusInput(index - 1);
-      setOTPInputs(newInputs);
+      setInputs("", index);
     }
   };
 
@@ -118,30 +134,36 @@ const OTP = ({ OTPStructure }: OTPProps) => {
   };
 
   return (
-    <div className="flex items-center gap-2 mt-4">
-      {OTPInputs.map((input, listIndex) => {
-        if (typeof input !== "string") {
-          return (
-            <input
-              key={listIndex}
-              value={input.value}
-              onChange={({ target }) =>
-                onInputChange(target.value, input.index)
-              }
-              onKeyDown={(event) => onKeyDown(event, input.index)}
-              //@ts-ignore
-              ref={(el) => el && (inputsRef.current[input.index] = el)}
-              className="border border-slate-400 text-xl p-2 size-16 text-center bg-transparent text-white"
-            />
-          );
-        }
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-2 mt-4">
+        {OTPInputs.map((input, listIndex) => {
+          if (typeof input !== "string") {
+            return (
+              <input
+                key={listIndex}
+                value={input.value}
+                onChange={({ target }) =>
+                  onInputChange(target.value, input.index)
+                }
+                onKeyDown={(event) => onKeyDown(event, input.index)}
+                //@ts-ignore
+                ref={(el) => el && (inputsRef.current[input.index] = el)}
+                className="border border-slate-400 text-xl p-2 size-16 text-center bg-transparent text-white"
+              />
+            );
+          }
 
-        return (
-          <span key={listIndex} className="text-white text-xl">
-            {input}
-          </span>
-        );
-      })}
+          return (
+            <span key={listIndex} className="text-white text-xl">
+              {input}
+            </span>
+          );
+        })}
+      </div>
+
+      <button className="bg-blue-600 rounded-md text-xl p-3 text-white tracking-wide">
+        Verify
+      </button>
     </div>
   );
 };
