@@ -39,6 +39,8 @@ const OTP = ({ OTPStructure }: OTPProps) => {
     setOTPInputs(newInputs);
   }, [OTPStructure]);
 
+  const isDigitChar = (value: string) => value.match(/\d/g);
+
   const focusInput = (index: number) => {
     inputsRef.current[index].focus();
   };
@@ -63,7 +65,7 @@ const OTP = ({ OTPStructure }: OTPProps) => {
   };
 
   const onInputChange = (value: string, index: number) => {
-    if (value.length === 1 && value.trim().match(/\d/g)) {
+    if (value.length === 1 && isDigitChar(value.trim())) {
       setInputs(value, index);
       index < inputsAmt - 1 && focusInput(index + 1);
     }
@@ -97,13 +99,32 @@ const OTP = ({ OTPStructure }: OTPProps) => {
     }
   };
 
+  const getSanitizedPastedCode = (code: string): string => {
+    let sanitizedCode = "";
+
+    code.split("").forEach((char) => {
+      if (isDigitChar(char)) {
+        sanitizedCode = sanitizedCode.concat(char);
+      }
+    });
+
+    return sanitizedCode.slice(0, inputsAmt);
+  };
+
   const onPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    const pastedCode = event.clipboardData.getData("text");
-    const pastedCodeChars = pastedCode.split("");
 
-    for (let i = 0; i < pastedCodeChars.length; i++) {
-      setInputs(pastedCodeChars[i], i);
+    const pastedCode = event.clipboardData.getData("text").trim();
+    const sanitizedPastedCode = getSanitizedPastedCode(pastedCode.trim());
+
+    for (let i = 0; i < sanitizedPastedCode.length; i++) {
+      setInputs(sanitizedPastedCode[i], i);
+    }
+
+    if (sanitizedPastedCode.length < inputsAmt) {
+      focusInput(sanitizedPastedCode.length);
+    } else {
+      focusInput(inputsAmt - 1);
     }
   };
 
