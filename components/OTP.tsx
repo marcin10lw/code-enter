@@ -1,28 +1,28 @@
 "use client";
 
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
 interface OTPProps {
   OTPStructure: (number | string)[];
 }
 
-type OTPInput =
-  | {
-      index: number;
-      value: string;
-    }
-  | string;
+type OTPInput = {
+  index: number;
+  value: string;
+};
 
 const OTP = ({ OTPStructure }: OTPProps) => {
-  const [OTPInputs, setOTPInputs] = useState<OTPInput[]>([]);
+  const [OTPInputs, setOTPInputs] = useState<(OTPInput | string)[]>([]);
   const inputsRef = useRef<HTMLInputElement[]>([]);
 
-  const inputsAmt = OTPInputs.filter(
-    (input) => typeof input !== "string"
-  ).length;
+  const filteredOTPInputs = OTPInputs.filter(
+    (input): input is OTPInput => typeof input !== "string"
+  );
+
+  const inputsAmt = filteredOTPInputs.length;
 
   useEffect(() => {
-    const newInputs: OTPInput[] = [];
+    const newInputs: (OTPInput | string)[] = [];
     let newIndex = 0;
 
     OTPStructure.forEach((item) => {
@@ -134,8 +134,23 @@ const OTP = ({ OTPStructure }: OTPProps) => {
     }
   };
 
+  const disabled = filteredOTPInputs.some((input) => input.value === "");
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (disabled) return;
+
+    const finalCode = filteredOTPInputs.reduce(
+      (acc, { value }) => acc + value,
+      ""
+    );
+
+    alert(finalCode);
+  };
+
   return (
-    <div className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
       <div className="flex items-center gap-2 mt-4">
         {OTPInputs.map((input, listIndex) => {
           if (typeof input !== "string") {
@@ -163,10 +178,13 @@ const OTP = ({ OTPStructure }: OTPProps) => {
         })}
       </div>
 
-      <button className="bg-blue-600 rounded-md text-xl p-3 text-white tracking-wide">
+      <button
+        disabled={disabled}
+        className="bg-blue-600 rounded-md disabled:pointer-events-none hover:bg-blue-700 disabled:opacity-70 text-xl p-3 text-white tracking-wide"
+      >
         Verify
       </button>
-    </div>
+    </form>
   );
 };
 
