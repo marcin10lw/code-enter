@@ -161,8 +161,8 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
 
   return (
     OTPInputs.length > 0 && (
-      <section className="rounded-md bg-slate-800 p-6 pb-6">
-        <h1 className="mb-6 text-center text-2xl text-white">
+      <section className="rounded-md bg-slate-800 p-6">
+        <h1 className="mb-6 text-center text-2xl text-slate-200">
           Enter verification code
         </h1>
         <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
@@ -182,13 +182,13 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
                       el && (inputRefs.current[input.index] = el);
                     }}
                     autoFocus={autoFocus && input.index === 0}
-                    className="h-16 w-full max-w-16 border border-slate-400 bg-transparent text-center text-xl text-white"
+                    className="h-16 w-full max-w-16 border border-slate-400 bg-transparent text-center text-xl text-slate-200"
                   />
                 );
               }
 
               return (
-                <span key={listIndex} className="text-xl text-white">
+                <span key={listIndex} className="text-xl text-slate-200">
                   {input}
                 </span>
               );
