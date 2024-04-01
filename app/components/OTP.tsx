@@ -54,7 +54,7 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
     }
   };
 
-  const setInputs = (value: string, index: number) => {
+  const updateInputs = (value: string, index: number) => {
     setOTPInputs((prevInputs) =>
       prevInputs.map((input) => {
         if (typeof input !== "string" && input.index === index) {
@@ -70,14 +70,9 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
   };
 
   const onInputChange = (value: string, index: number) => {
-    if (value.length === 0) {
-      focusInput(index, "prev");
-      setInputs("", index);
-    } else {
-      if (isDigitChar(value.trim())) {
-        setInputs(value.slice(-1), index);
-        focusInput(index, "next");
-      }
+    if (value.length > 0 && isDigitChar(value.trim())) {
+      updateInputs(value.slice(-1), index);
+      focusInput(index, "next");
     }
   };
 
@@ -92,8 +87,9 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
       focusInput(index, "next");
     }
 
-    if (event.key === "Backspace" && !event.currentTarget.value) {
+    if (event.key === "Backspace") {
       event.preventDefault();
+      updateInputs("", index);
       focusInput(index, "prev");
     }
   };
@@ -117,7 +113,7 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
     const sanitizedPastedCode = getSanitizedPastedCode(pastedCode);
 
     for (let i = 0; i < sanitizedPastedCode.length; i++) {
-      setInputs(sanitizedPastedCode[i], i);
+      updateInputs(sanitizedPastedCode[i], i);
     }
 
     if (sanitizedPastedCode.length < inputsAmount) {
