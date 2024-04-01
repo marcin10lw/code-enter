@@ -54,16 +54,6 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
     }
   };
 
-  const selectInput = (index: number, action?: "prev" | "next") => {
-    if (action === "prev" && index > 0) {
-      inputRefs.current[index - 1].select();
-    } else if (action === "next" && index < inputsAmount - 1) {
-      inputRefs.current[index + 1].select();
-    } else {
-      inputRefs.current[index].select();
-    }
-  };
-
   const setInputs = (value: string, index: number) => {
     setOTPInputs((prevInputs) =>
       prevInputs.map((input) => {
@@ -80,18 +70,14 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
   };
 
   const onInputChange = (value: string, index: number) => {
-    if (value.length === 1 && isDigitChar(value.trim())) {
-      setInputs(value, index);
-      focusInput(index, "next");
-    }
-
-    if (value.length > 1) {
-      focusInput(index, "next");
-    }
-
     if (value.length === 0) {
       focusInput(index, "prev");
       setInputs("", index);
+    } else {
+      if (isDigitChar(value.trim())) {
+        setInputs(value.slice(-1), index);
+        focusInput(index, "next");
+      }
     }
   };
 
@@ -99,13 +85,11 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       focusInput(index, "prev");
-      selectInput(index, "prev");
     }
 
     if (event.key === "ArrowRight") {
       event.preventDefault();
       focusInput(index, "next");
-      selectInput(index, "next");
     }
 
     if (event.key === "Backspace" && !event.currentTarget.value) {
