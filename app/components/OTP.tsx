@@ -150,7 +150,7 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
           Enter verification code
         </h1>
         <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             {OTPInputs.map((input, listIndex) => {
               if (typeof input !== "string") {
                 return (
@@ -167,6 +167,7 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
                     }}
                     autoFocus={autoFocus && input.index === 0}
                     className="h-16 w-full max-w-16 border border-slate-400 bg-transparent text-center text-xl text-slate-200"
+                    type="tel"
                   />
                 );
               }

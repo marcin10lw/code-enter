@@ -1,5 +1,5 @@
-import OTP from "@/app/OTP";
-import TestCodes from "./TestCodes";
+import OTP from "@/app/components/OTP";
+import TestCodes from "./components/TestCodes";
 
 export default function Home() {
   return (
