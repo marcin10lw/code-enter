@@ -20,6 +20,8 @@ The OTP Input Component is a React component designed for entering and verifying
 
 - **autoFocus** (`boolean`, optional, default: `true`): Determines whether the first input field should be autofocused upon component mount.
 
+- **onSubmit** (`(value: string) => void`): A function called when the OTP code is submitted. It receives the OTP code as a string parameter.
+
 ## Features
 
 - **Structured Input**: Define the structure of the OTP input using numbers and separators.
