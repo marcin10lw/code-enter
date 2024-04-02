@@ -7,6 +7,7 @@ const isDigitChar = (value: string) => value.match(/\d/g);
 interface OTPProps {
   OTPStructure: (number | string)[];
   autoFocus?: boolean;
+  onSubmit: (value: string) => void;
 }
 
 type OTPInput = {
@@ -14,7 +15,7 @@ type OTPInput = {
   value: string;
 };
 
-const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
+const OTP = ({ OTPStructure, autoFocus = true, onSubmit }: OTPProps) => {
   const [OTPInputs, setOTPInputs] = useState<(OTPInput | string)[]>([]);
   const inputRefs = useRef<HTMLInputElement[]>([]);
 
@@ -123,7 +124,7 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
     }
   };
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const onCodeVerify = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (disabled) return;
@@ -131,12 +132,12 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
     const finalCode = OTPInputs.reduce((acc, input) => {
       if (typeof input !== "string") {
         return acc + input.value;
-      } else {
-        return acc + input;
       }
-    }, "");
 
-    alert(finalCode);
+      return acc + input;
+    }, "") as string;
+
+    onSubmit(finalCode);
   };
 
   return (
@@ -145,7 +146,11 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
         <h1 className="mb-6 text-center text-2xl text-slate-200">
           Enter verification code
         </h1>
-        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
+        <form
+          onSubmit={onCodeVerify}
+          noValidate
+          className="flex flex-col items-center gap-6"
+        >
           <div className="flex items-center gap-1 md:gap-2">
             {OTPInputs.map((input, listIndex) => {
               if (typeof input !== "string") {
@@ -178,7 +183,7 @@ const OTP = ({ OTPStructure, autoFocus = true }: OTPProps) => {
 
           <button
             disabled={disabled}
-            className="rounded-sm bg-blue-600 p-3 text-xl tracking-wide text-white hover:bg-blue-500 disabled:pointer-events-none disabled:opacity-70"
+            className="w-full rounded-sm bg-blue-600 p-3 text-xl tracking-wide text-white hover:bg-blue-500 disabled:pointer-events-none disabled:opacity-70"
           >
             Verify
           </button>
