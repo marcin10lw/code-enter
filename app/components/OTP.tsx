@@ -2,7 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
-const isDigitChar = (value: string) => value.match(/^\d+$/);
+const isDigitChar = (value: string) => /^\d$/.test(value);
 
 interface OTPProps {
   OTPStructure: (number | string)[];
@@ -93,12 +93,16 @@ const OTP = ({ OTPStructure, autoFocus = true, onSubmit }: OTPProps) => {
   };
 
   const onInputChange = (value: string, index: number) => {
-    const lastChar = value.slice(-1).trim();
+    if (value.split("").some((char) => !isDigitChar(char))) return;
 
-    if (!isDigitChar(lastChar)) return;
+    const lastChar = value.slice(-1).trim();
+    const firstChar = value.charAt(0);
+
+    const updateChar =
+      inputRefs.current[index].selectionStart === 1 ? firstChar : lastChar;
 
     if (value.length > 0) {
-      updateInputs(lastChar, index);
+      updateInputs(updateChar, index);
       focusInput(index, "next");
     }
   };
@@ -204,8 +208,8 @@ const OTP = ({ OTPStructure, autoFocus = true, onSubmit }: OTPProps) => {
                           el && (inputRefs.current[input.index] = el);
                         }}
                         autoFocus={autoFocus && input.index === 0}
-                        className="h-16 w-full max-w-16 border border-slate-400 bg-transparent text-center text-xl text-slate-200 focus-visible:border focus-visible:border-white focus-visible:outline-none"
                         type="tel"
+                        className="h-16 w-full max-w-16 border border-slate-400 bg-transparent text-center text-xl text-slate-200 focus-visible:border focus-visible:border-white focus-visible:outline-none"
                       />
                     ))}
                   </div>
