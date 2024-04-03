@@ -28,7 +28,7 @@ const OTP = ({ OTPStructure, autoFocus = true, onSubmit }: OTPProps) => {
   const filteredOTPInputs = OTPInputsStruct.filter(isOTPInputArray);
 
   const inputsAmount = filteredOTPInputs.reduce(
-    (previousValue, currentValue) => previousValue + currentValue.length,
+    (acc, currVal) => acc + currVal.length,
     0,
   );
 
@@ -133,18 +133,27 @@ const OTP = ({ OTPStructure, autoFocus = true, onSubmit }: OTPProps) => {
     return sanitizedCode.slice(0, inputsAmount);
   };
 
-  const onPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+  const onPaste = (
+    event: React.ClipboardEvent<HTMLInputElement>,
+    index: number,
+  ) => {
     event.preventDefault();
 
     const pastedCode = event.clipboardData.getData("text").trim();
     const sanitizedPastedCode = getSanitizedPastedCode(pastedCode);
 
-    for (let i = 0; i < sanitizedPastedCode.length; i++) {
-      updateInputs(sanitizedPastedCode[i], i);
+    let newIndex = index;
+    for (
+      let i = 0;
+      i < sanitizedPastedCode.length && newIndex < inputsAmount;
+      i++
+    ) {
+      updateInputs(sanitizedPastedCode[i], newIndex);
+      newIndex++;
     }
 
-    if (sanitizedPastedCode.length < inputsAmount) {
-      focusInput(sanitizedPastedCode.length);
+    if (newIndex < inputsAmount) {
+      focusInput(newIndex);
     } else {
       focusInput(inputsAmount - 1);
     }
@@ -190,12 +199,12 @@ const OTP = ({ OTPStructure, autoFocus = true, onSubmit }: OTPProps) => {
                           onInputChange(target.value, input.index)
                         }
                         onKeyDown={(event) => onKeyDown(event, input.index)}
-                        onPaste={onPaste}
+                        onPaste={(event) => onPaste(event, input.index)}
                         ref={(el) => {
                           el && (inputRefs.current[input.index] = el);
                         }}
                         autoFocus={autoFocus && input.index === 0}
-                        className="h-16 w-full max-w-16 border border-slate-400 bg-transparent text-center text-xl text-slate-200"
+                        className="h-16 w-full max-w-16 border border-slate-400 bg-transparent text-center text-xl text-slate-200 focus-visible:border focus-visible:border-white focus-visible:outline-none"
                         type="tel"
                       />
                     ))}
@@ -212,8 +221,8 @@ const OTP = ({ OTPStructure, autoFocus = true, onSubmit }: OTPProps) => {
           </div>
 
           {disabled && (
-            <p className="absolute top-[calc(100%_+_6px)] w-full text-center text-rose-700">
-              Please fill all fields
+            <p className="absolute top-[calc(100%_+_10px)] w-full text-center text-sm text-rose-800">
+              Please fill in all fields
             </p>
           )}
         </div>
