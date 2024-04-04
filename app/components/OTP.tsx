@@ -226,7 +226,7 @@ const OTP = ({ OTPStructure, autoFocus = true, onSubmit }: OTPProps) => {
 
           {disabled && (
             <p className="absolute top-[calc(100%_+_10px)] w-full text-center text-sm text-rose-800">
-              Please fill in all fields
+              Please fill in all fields with digits only.
             </p>
           )}
         </div>
